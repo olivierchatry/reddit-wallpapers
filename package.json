@@ -1,0 +1,28 @@
+{
+  "name": "reddit-wallpapers",
+  "version": "1.0.0",
+  "description": "Downloads wallpapers from reddit",
+  "main": "app.js",
+  "dependencies": {
+    "async": "^2.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olivierchatry/reddit-wallpapers.git"
+  },
+  "keywords": [
+    "reddit",
+    "wallpapers",
+    "wallpaper"
+  ],
+  "author": "Olivier Chatry",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/olivierchatry/reddit-wallpapers/issues"
+  },
+  "homepage": "https://github.com/olivierchatry/reddit-wallpapers#readme"
+}
