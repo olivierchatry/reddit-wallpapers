@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const https = require('https')
 const http	= require('http')
 const url		= require('url')
@@ -110,7 +112,12 @@ try {
 	process.exit(-1)
 }
 
-configuration.path = configuration.path.replace("$HOME", process.env.USERPROFILE || process.env.HOME)
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
+
+configuration.path = configuration.path.replaceAll("$HOME", process.env.USERPROFILE || process.env.HOME).replaceAll("/", path.sep).replaceAll("\\", path.sep)
 
 async.each(
 	configuration.subs,
