@@ -7,10 +7,6 @@ const path	= require("path")
 const fs		= require("fs")
 const async = require("async")
 
-const isBlank = function (str) {
-    return (!str || /^\s*$/.test(str));
-}
-
 const mkdirp = (fullPath) => {
 	path.dirname(fullPath).split(path.sep).reduce((current, folder) => {
 		current += folder + path.sep;
@@ -29,23 +25,28 @@ const downloadToFile = (where, link, callback) => {
 	const parsed = url.parse(link)
 
 	const fileName = path.join(where, path.basename(parsed.pathname))
-	mkdirp(fileName)
-	const file = fs.createWriteStream(fileName)
-
-	console.log(`downloading ${link}`)
-	req.get(
-		link,
-		response => {
-			response.pipe(file)
-			response.on("end", callback)
+	fs.access(fileName, fs.constants.F_OK, (err) => {
+		if (err) {
+			mkdirp(fileName)
+			const file = fs.createWriteStream(fileName)
+			console.log(`downloading ${link}`)
+			req.get(
+				link,
+				response => {
+					response.pipe(file)
+					response.on("end", callback)
+				}
+			).on("error", function(e) {
+				console.error(`failed to download ${link}`)
+				callback()
+			})
+		} else {
+			callback()
 		}
-	).on("error", function(e) {
-		console.error(`failed to download ${link}`)
-		callback()
 	})
 }
 
-const GetJSON = (url, path, callback) => {
+const getJSON = (url, path, callback) => {
 	https.get({
 			host:url,
 			path:path
@@ -65,7 +66,7 @@ const GetJSON = (url, path, callback) => {
 				callback(json)
 			})
 		}
-	).on("error", (e) => GetJSON(url, path, callback))
+	).on("error", (e) => getJSON(url, path, callback))
 }
 
 const getImageLinks = (subRedit, query, limit, sort, callback) => {
@@ -75,7 +76,7 @@ const getImageLinks = (subRedit, query, limit, sort, callback) => {
 	let launchQuery = (after) => {
 		const queryPath = generateQueryString(subRedit, query, limit, sort, after)
 		console.log(`launching query ${queryPath}`)
-		GetJSON(
+		getJSON(
 			"www.reddit.com", 
 			queryPath,
 			(json) => {
@@ -102,6 +103,7 @@ const getImageLinks = (subRedit, query, limit, sort, callback) => {
 }
 
 let configuration
+
 
 try {
 	configuration = require(
@@ -130,7 +132,11 @@ async.each(
 		getImageLinks(sub.name, sub.query, sub.count, sub.sort, (links) => {
 			async.forEach(links,
 				function(link, callbackLink) {
-					downloadToFile(path.join(configuration.path, sub.name), link, callbackLink)
+					downloadToFile(
+						configuration.includeSubName ? path.join(configuration.path, sub.name) : configuration.path, 
+						link, 
+						callbackLink
+					)
 				},
 				function() {
 					callbackSub()

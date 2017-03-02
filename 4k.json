@@ -2,10 +2,9 @@
 	"path":"$HOME\\Pictures\\Wallpapers",
 	"subs":[
 		{
-			"name":"ultrahdwallpapers"
-		},
-		{
-			"name":"WQHD_Wallpaper"
+			"count":200,
+			"name":"WQHD_Wallpaper",
+			"includeSubName":false
 		}
 	]
 }
